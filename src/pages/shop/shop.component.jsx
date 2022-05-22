@@ -21,11 +21,26 @@ class ShopPage extends React.Component {
   unsubsribeFromSnapshot = null;
 
   componentDidMount() {
-    const collectioRef = firestore.collection("collections");
-    collectioRef.onSnapshot(async (snapshot) => {
-      this.props.updateCollections(convertCollectionsSnapshotToMap(snapshot));
-      this.setState({ loading: false });
-    });
+    const {updateCollections} = this.props;
+    const collectionRef = firestore.collection("collections");
+
+    // collectionRef.onSnapshot(async (snapshot) => {
+    //   const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
+    //   updateCollections(collectionsMap);
+    //   this.setState({ loading: false });
+    // }); this is a observable based approach
+
+    collectionRef.get().then(snapShot => {
+      const collectionMap = convertCollectionsSnapshotToMap(snapShot);
+      updateCollections(collectionMap);
+      this.setState({loading: false});
+    }) // this is a promise based call approach
+
+    // const res = await fetch("https://firestore.googleapis.com/v1/projects/crwn-db-40123/databases/(default)/documents/collections")
+    // const collections = await res.json();
+    // console.log(collections);
+    // this is the async/await approach
+
   }
 
   render() {
