@@ -1,26 +1,22 @@
-import React from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 
-import CollectionsOverview from "../../components/collections-overview/collections-overview.component";
-import CollectionPage from "../collection/collection.component";
+// import CollectionsOverview from "../../components/collections-overview/collections-overview.component";
+// import CollectionPage from "../collection/collection.component";
 import { Route } from "react-router-dom";
-import { createStructuredSelector } from "reselect";
-import { updateCollections } from "../../redux/shop/shop.actions";
+// import { createStructuredSelector } from "reselect";
+// import { updateCollections } from "../../redux/shop/shop.actions";
 import { connect } from "react-redux";
-import WithSpinner from "../../components/with-spinner/with-spinner.component";
+// import WithSpinner from "../../components/with-spinner/with-spinner.component";
 import { fetchCollectionsStart } from "../../redux/shop/shop.actions";
-import { selectIsCollectionFetching, selectIsCollectionsLoaded } from "../../redux/shop/shop.selectors";
-import CollectionsOverviewContainer from "../../components/collections-overview/collections-overview.container";
-import CollectionPageContainer from "../collection/collection.container";
-
-class ShopPage extends React.Component {
-  state = {
-    loading: true,
-  };
-  unsubsribeFromSnapshot = null;
-
-  componentDidMount() {
-    const {fetchCollectionsStart} = this.props;
+// import { selectIsCollectionFetching, selectIsCollectionsLoaded } from "../../redux/shop/shop.selectors";
+// import CollectionsOverviewContainer from "../../components/collections-overview/collections-overview.container";
+// import CollectionPageContainer from "../collection/collection.container";
+const CollectionsOverviewContainer = lazy(() => import("../../components/collections-overview/collections-overview.container"));
+const CollectionPageContainer = lazy(() => import("../collection/collection.container"));
+const ShopPage = ({fetchCollectionsStart, match}) =>  {
+  useEffect(() => {
     fetchCollectionsStart();
+  }, [fetchCollectionsStart])
 
     // collectionRef.onSnapshot(async (snapshot) => {
     //   const collectionsMap = convertCollectionsSnapshotToMap(snapshot);
@@ -34,12 +30,9 @@ class ShopPage extends React.Component {
     // console.log(collections);
     // this is the async/await approach
 
-  }
-
-  render() {
-    const { match } = this.props;
     return (
       <div className="shop-page">
+        <Suspense fallback={<div>Loading...</div>}>
         <Route
           exact
           path={`${match.path}`}
@@ -57,11 +50,11 @@ class ShopPage extends React.Component {
           // }}
           component={CollectionPageContainer}
         />
+        </Suspense>
       </div>
     );
-  }
-}
 
+    }
 const mapdispatchToProps = (dispatch) => ({
   fetchCollectionsStart: () => dispatch(fetchCollectionsStart()),
 });
